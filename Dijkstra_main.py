@@ -13,7 +13,7 @@ def main():
     g = Graph(edges);
 
     res = g.find_distance('a','f');
-    print(res);
+    print(res);     ## should be 21.
     
     return 0;
 
