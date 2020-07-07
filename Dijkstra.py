@@ -2,6 +2,9 @@
 # Dijkstra's algorithm implementation.
 # Dijkstra's algorithm is an algorithm for finding the shortest paths between nodes in a graph.
 
+## Use MinHeap structure to sort the data.
+from heap_queue import MinHeap;
+
 DEBUG = 0;
 class Graph:
     # Graph class, with directed edges and weight/distance.
@@ -66,38 +69,47 @@ class Graph:
         hash_2D_map =   self.generate_2D_map();
 
         visited = set();
-        to_be_visited   =   [   (start, start, 0)];
+
+        #to_be_visited   =   [   (start, start, 0)];
+
+        ## Using MinHeap to keep the list of next vertices,
+        #   top heap will be vertice with smallest distance.
+        to_be_visited   =   MinHeap();
+        to_be_visited.set_comparison_func( lambda pt: pt[2]);
+        to_be_visited.heappush( (start, start, 0)   );
         
         if DEBUG:   visit_sequences =   [];
 
         while to_be_visited and dest not in visited:
 
-            #u, v, dist =   to_be_visited.pop(0);
 
-            u, v, ind        =   None, None, None;
-            dist = float('inf');
 
-            for i, (tu, tv, tdist) in enumerate(to_be_visited):
-                if tdist<dist:
-                    ind, dist    =   i, tdist;
+            # Obtain the smallest distance node, and added it from start node to this node.
+            u, v, dist  =   to_be_visited.heappop();
 
-            u, v, dist  =   to_be_visited.pop(ind);
+            if v in visited:    continue;
 
             hash_2D_map[(start,v)] = min(   hash_2D_map[(start,v)],
                                             hash_2D_map[(start,u)] + hash_2D_map[(u,v)]
                                         );
 
+            # Keeps track of each visited node.
             visited.add(v);
+
             if DEBUG:       visit_sequences.append(v);
 
             try:
-                next_visits = [   (v, next_v, self.graph[v][next_v])   for next_v in self.graph[v].keys()];
-                to_be_visited.extend(next_visits);
-            
+                #next_visits = [   (v, next_v, self.graph[v][next_v])   for next_v in self.graph[v].keys()];
+                #to_be_visited.extend(next_visits);
+                #to_be_visited.sort(    key = lambda pt: pt[2]);
+
+                for next_v in self.graph[v].keys():
+                    item    =   (   v,     next_v,     hash_2D_map[(start,v)] + self.graph[v][next_v]   );
+                    to_be_visited.heappush( item);
+
             except:
                 None
             
-
         if DEBUG:       print(visit_sequences);
 
         if dest not in visited:     return None;
